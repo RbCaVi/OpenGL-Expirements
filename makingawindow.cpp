@@ -4,7 +4,9 @@
 #include <shader.h>
 #include "stb_image.h"
 #include <iostream>
-#include <math.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 //functions used later in the program for, framebuffer & getting input
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -123,7 +125,7 @@ int main()
     //Generates a vertex buffer, setting VBO as an id to it
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
-
+    
 
     //binds the vertex array object
     glBindVertexArray(VAO);
