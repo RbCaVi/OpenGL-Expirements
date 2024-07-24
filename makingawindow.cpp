@@ -119,7 +119,7 @@ int main()
     //compiles the shader
     Shader ourShader("D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/shaders/shader.vs", "D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/shaders/shader.fs");
 
-
+    
     //generates a vertex attribute array
     glGenVertexArrays(1, &VAO);
     //Generates a vertex buffer, setting VBO as an id to it
@@ -164,7 +164,8 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     int width, height, nrChannels;
-    unsigned char* data = stbi_load("D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/milly.png", &width, &height, &nrChannels, 0);
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load("D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/assets/milly.png", &width, &height, &nrChannels, 0);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -182,8 +183,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* secondata = stbi_load("D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/boba.png", &width, &height, &nrChannels, 0);
+    unsigned char* secondata = stbi_load("D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/assets/boba.png", &width, &height, &nrChannels, 0);
     if (secondata) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, secondata);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -196,6 +196,7 @@ int main()
     glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
     ourShader.setInt("texture2", 1);
 
+    
 
     //the render loop
     while (!glfwWindowShouldClose(window))
@@ -215,6 +216,16 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
+
+        //Sets the uniform "transform" mat4 for the shader code to the trans glm mat4
+        unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
+        //glm mat4 translation matrix
+        glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
         //uses the program
         ourShader.use();
         //draws vertexs from the VAO that pulls each vertex point to draw,

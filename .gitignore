@@ -419,4 +419,5 @@ FodyWeavers.xsd
 Libraries
 glad
 glm/
+build
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,visualstudiocode
