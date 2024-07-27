@@ -1,12 +1,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <shader.h>
 #include "stb_image.h"
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <shader.h>
+
 
 //functions used later in the program for, framebuffer & getting input
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -92,6 +93,20 @@ float vertices[] = {
 unsigned int indices[] = {
     0,1,2,
     0,2,3
+};
+
+//translation for the cube positions using vec3
+glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
 /* float texCoords[] = {
@@ -230,7 +245,8 @@ int main()
     ourShader.setInt("texture1", 0);
     ourShader.setInt("texture2", 1);
 
-    
+    //Enables the Z-BUFFER
+    glEnable(GL_DEPTH_TEST);
 
     //the render loop
     while (!glfwWindowShouldClose(window))
@@ -239,19 +255,20 @@ int main()
         glfwSwapBuffers(window);
         //a function to handle input
         processInput(window);
-        //Enables the Z-BUFFER
-        glEnable(GL_DEPTH_TEST);
         //rendering commands
         //sets the back color of the toberendered buffer to the rgba values
         glClearColor(0.4f, 0.3f, 0.5f, 1.0f);
         //clears it to the the color buffer (i.e. the clear color setting) & uses the z-buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         //sets & binds each of the textures
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
+
+        //uses the program
+        ourShader.use();
 
         //sets up uniforms for the coordinate spaces
         //--unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
@@ -263,33 +280,48 @@ int main()
         //--glm::mat4 trans = glm::mat4(1.0f);
 
         //Base mat4 coordinate transformations
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 projection;
         glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
 
         //sets the value for each mat4 transformation in coordinate spaces
-        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-        //rotates the local space by 50 rads over time
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
         //Sets the above matrix values to their corresponding uniforms
         //--glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        
+        ourShader.setMat4("projection", projection);
+        ourShader.setMat4("view", view);
         
         //--trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
         //--trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
         
-        //uses the program
-        ourShader.use();
+        
+
+        for (unsigned int i = 0; i < 10; i++) {
+
+            glm::mat4 model = glm::mat4(1.0f);
+
+            float amountRotatedAngle = -55.0f * i;
+
+
+            model = glm::translate(model, cubePositions[i]);
+            model = glm::rotate(model, glm::radians(amountRotatedAngle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+
+            //rotates the local space by 50 rads over time
+            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+            ourShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        
         //draws vertexs from the VAO that pulls each vertex point to draw,
         //and draws each VAO as an element of a triangle
         //--glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
         
         //checks if any events were triggered (i.e. input from kb&m)
         glfwPollEvents();
