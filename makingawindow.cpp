@@ -109,6 +109,13 @@ glm::vec3 cubePositions[] = {
     glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+
 /* float texCoords[] = {
     0.0f, 0.0f,
     1.0f, 0.0f,
@@ -297,12 +304,13 @@ int main()
         //--trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
         
         
-
+        //model render loop
         for (unsigned int i = 0; i < 10; i++) {
 
             glm::mat4 model = glm::mat4(1.0f);
 
             float amountRotatedAngle = -55.0f * i;
+            float deltaRotatedAngle = 55.0f + (i * 100);
 
 
             model = glm::translate(model, cubePositions[i]);
@@ -310,16 +318,18 @@ int main()
 
 
             //rotates the local space by 50 rads over time
-            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(deltaRotatedAngle), glm::vec3(0.5f, 1.0f, 0.0f));
 
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
             ourShader.setMat4("model", model);
+
+            //draws vertexs from the VAO that pulls each vertex point to draw,
+            //and draws each VAO as an element of a triangle
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
         
-        //draws vertexs from the VAO that pulls each vertex point to draw,
-        //and draws each VAO as an element of a triangle
+
         //--glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         
         
