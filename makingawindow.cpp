@@ -12,6 +12,9 @@
 //functions used later in the program for, framebuffer & getting input
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+//sets up the mouse
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 //framebuffer variables
 int framebufferWidth;
@@ -43,6 +46,23 @@ char infoLog[512];
 //const default screen sizes
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+//changes in the cameras speed
+float changeInCameraSpeed = 0.0f;
+
+//setting the inital mouse position
+float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2;
+
+//deltatime & lastframe variables
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+//direction for the rotation
+float yaw = -90.0f;
+float pitch = 0.0f;
+bool firstMouse = true;
+float fov = 45.0f;
+
 
 //vertex data for a cube
 //first 3 values are the (x,y,z), the last 2 values are (s,t) for textures
@@ -110,20 +130,17 @@ glm::vec3 cubePositions[] = {
 };
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+//--glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+//--glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+//--glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
 
 /* float texCoords[] = {
     0.0f, 0.0f,
     1.0f, 0.0f,
     0.5f, 1.0f
 }; */
-
-
-
 
 int main()
 {
@@ -274,6 +291,11 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
+        //gets the deltaTime using differing times & frames
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         //uses the program
         ourShader.use();
 
@@ -287,13 +309,19 @@ int main()
         //--glm::mat4 trans = glm::mat4(1.0f);
 
         //Base mat4 coordinate transformations
-        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 view;
         glm::mat4 projection = glm::mat4(1.0f);
 
-        //sets the value for each mat4 transformation in coordinate spaces
-        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        const float radialSpin = 10.0f;
+        float camX = sin(glfwGetTime()) * radialSpin;
+        float camZ = cos(glfwGetTime()) * radialSpin;
 
+        //--view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), cameraFront, cameraUp);
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+        //sets the value for each mat4 transformation in coordinate spaces
+        projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        
         //Sets the above matrix values to their corresponding uniforms
         //--glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
         
@@ -320,19 +348,14 @@ int main()
             //rotates the local space by 50 rads over time
             model = glm::rotate(model, (float)glfwGetTime() * glm::radians(deltaRotatedAngle), glm::vec3(0.5f, 1.0f, 0.0f));
 
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
             ourShader.setMat4("model", model);
 
             //draws vertexs from the VAO that pulls each vertex point to draw,
             //and draws each VAO as an element of a triangle
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-
-        
-
         //--glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        
-        
+
         //checks if any events were triggered (i.e. input from kb&m)
         glfwPollEvents();
     }
@@ -348,6 +371,16 @@ int main()
 
 //takes in the input while window is active
 void processInput(GLFWwindow* window) {
+    //disables visible cursor capture
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //sets the cursor input to the proper function
+    glfwSetCursorPosCallback(window, mouse_callback);
+    //sets the scroll wheel input to its proper callback
+    glfwSetScrollCallback(window, scroll_callback);
+    //camera movement speed
+    float cameraSpeed = 2.5f * deltaTime + changeInCameraSpeed;
+    //right normalized vector
+    glm::vec3 rightDirectionVector = glm::normalize(glm::cross(cameraFront, cameraUp));
     //if esc is pressed then close the window
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -357,8 +390,63 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        cameraPos += cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        cameraPos -= cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        cameraPos -= rightDirectionVector * cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        cameraPos += rightDirectionVector * cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS) {
+        changeInCameraSpeed += 0.01f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
+        changeInCameraSpeed -= 0.01f;
+    }
 }
+//handles mouse input functionality
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    //captures the offset of the mouse's position
+    float xoffset = xpos - lastX;
+    float yoffset = ypos - lastY;
+        lastX = xpos;
+        lastY = ypos;
 
+    //the amount of power that the capture has
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    //updates the yaw and pitch according to the offset
+    yaw += xoffset;
+    pitch += yoffset;
+
+    //pitch parameters
+    if (pitch > 89.0f) {
+        pitch = 89.0f;
+    } if (pitch < -89.0f) {
+        pitch = -89.0f;
+    }
+    //using the input variables to make the new direction & normalizing it
+    glm::vec3 direction = glm::vec3(cos(glm::radians(yaw)) * cos(glm::radians(yaw)),
+        sin(glm::radians(pitch)),
+        sin(glm::radians(yaw)) * cos(glm::radians(pitch)));
+    cameraFront = glm::normalize(direction);
+}
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    //takes in the scroll wheel's offset and sets parameters
+    fov -= (float)yoffset;
+    if (fov < 1.0f) {
+        fov = 1.0f;
+    } if (fov > 45.0f) {
+        fov = 45.0f;
+    }
+}
 //sets the framebuffersize to change so the viewport adjusts
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
