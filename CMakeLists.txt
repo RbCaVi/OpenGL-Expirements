@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.0)
-
+cmake_minimum_required(VERSION 3.27)
 project(GLExperiments)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 
-file(TO_NATIVE_PATH "${STAGED_INSTALL_PREFIX}/Libs/")
 
-set(SOURCES makingawindow.cpp)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+
+
+add_executable(window "${CMAKE_CURRENT_SOURCE_DIR}/makingawindow.cpp")
+target_include_directories(window PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/Includes")
+target_link_directories(window PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/Libs")

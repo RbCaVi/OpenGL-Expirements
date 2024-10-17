@@ -1,4 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
+#pragma warning(disable : 4996)
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "stb_image.h"
@@ -7,6 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <shader.h>
+#include <filesystem>
+#include <string>
 
 
 //functions used later in the program for, framebuffer & getting input
@@ -19,6 +22,15 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 //framebuffer variables
 int framebufferWidth;
 int framebufferHeight;
+
+//current directory
+std::string currentPath = std::filesystem::current_path().string();
+char curPath[100];
+char vertexPath[100];
+char fragPath[100];
+char tex1Path[100];
+char tex2Path[100];
+
 
 //Vertex Array Object (i.e stores vertex attributes)
 unsigned int VAO;
@@ -44,8 +56,8 @@ int success;
 char infoLog[512];
 
 //const default screen sizes
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 2560;
+const unsigned int SCR_HEIGHT = 1440;
 
 //changes in the cameras speed
 float changeInCameraSpeed = 0.0f;
@@ -144,6 +156,23 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 int main()
 {
+    //setting up the path
+    char oldChar = '\\';
+    char newChar = '/';
+
+    // Iterate through the string and replace the characters
+    for (int i = 0; i < currentPath.length(); i++) {
+        if (currentPath[i] == oldChar) {
+            currentPath[i] = newChar;
+        }
+    }
+    strcpy_s(curPath, currentPath.c_str());
+    strcpy(vertexPath, curPath);
+    strcpy(fragPath, curPath);
+    strcpy(tex1Path, curPath);
+    strcpy(tex2Path, curPath);
+    std::cout << curPath << '\n';
+
     //glfw initilization
     glfwInit();
 
@@ -155,9 +184,8 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-
     //Creates glfw window to render pixels within
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, ":3 UwU XD SillyWindow", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, ":3 UwU XD SillyWindow", glfwGetPrimaryMonitor() , NULL);
 
     //checks that the new window isnt null, if it is then it will terminate with an error
     if (window == NULL)
@@ -192,7 +220,8 @@ int main()
     std::cout << "max num of vertex attributes supported: " << nrAttributes << std::endl;
 
     //compiles the shader
-    Shader ourShader("D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/shaders/shader.vs", "D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/shaders/shader.fs");
+    
+    Shader ourShader(strcat(vertexPath, "/shaders/shader.vs"), strcat(fragPath, "/shaders/shader.fs"));
 
     
     //generates a vertex attribute array
@@ -238,7 +267,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load("D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/assets/milly.png", &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(strcat(tex1Path, "/assets/milly.png"), &width, &height, &nrChannels, 0);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -256,7 +285,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    unsigned char* secondata = stbi_load("D:/Documents/Code/C & C++/GraphicsProgrammingVentures/GraphicsAPIWork/assets/boba.png", &width, &height, &nrChannels, 0);
+    unsigned char* secondata = stbi_load(strcat(tex2Path, "/assets/boba.png"), &width, &height, &nrChannels, 0);
     if (secondata) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, secondata);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -337,8 +366,8 @@ int main()
 
             glm::mat4 model = glm::mat4(1.0f);
 
-            float amountRotatedAngle = -55.0f * i;
-            float deltaRotatedAngle = 55.0f + (i * 100);
+            float amountRotatedAngle = -10.0f * i;
+            float deltaRotatedAngle = 10.0f + (i * 100);
 
 
             model = glm::translate(model, cubePositions[i]);

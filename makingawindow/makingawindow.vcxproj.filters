@@ -37,5 +37,19 @@
     <Image Include="..\boba.png">
       <Filter>Source Files</Filter>
     </Image>
+    <Image Include="..\assets\boba.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\assets\milly.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\shaders\shader.fs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\shaders\shader.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
