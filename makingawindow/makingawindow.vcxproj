@@ -25,16 +25,23 @@
   <ItemGroup>
     <ClInclude Include="..\shader.h" />
     <ClInclude Include="..\stb_image.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\assets\boba.png" />
     <Image Include="..\assets\milly.png" />
     <Image Include="..\boba.png" />
     <Image Include="..\milly.png" />
+    <Image Include="bitmap1.bmp" />
+    <Image Include="icon.ico" />
+    <Image Include="icon1.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\shaders\shader.fs" />
     <None Include="..\shaders\shader.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="makingawindow.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

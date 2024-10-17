@@ -23,14 +23,17 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 int framebufferWidth;
 int framebufferHeight;
 
-//current directory
+//icon image
+GLFWimage iconImage[1];
+
+//Path to all relevant files
 std::string currentPath = std::filesystem::current_path().string();
 char curPath[100];
 char vertexPath[100];
 char fragPath[100];
+char iconPath[100];
 char tex1Path[100];
 char tex2Path[100];
-
 
 //Vertex Array Object (i.e stores vertex attributes)
 unsigned int VAO;
@@ -154,9 +157,8 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
     0.5f, 1.0f
 }; */
 
-int main()
-{
-    //setting up the path
+//Prepares the paths
+void preparePath() {
     char oldChar = '\\';
     char newChar = '/';
 
@@ -171,7 +173,14 @@ int main()
     strcpy(fragPath, curPath);
     strcpy(tex1Path, curPath);
     strcpy(tex2Path, curPath);
+    strcpy(iconPath, curPath);
     std::cout << curPath << '\n';
+}
+
+int main()
+{
+    //Setting up the path
+    preparePath();
 
     //glfw initilization
     glfwInit();
@@ -186,6 +195,8 @@ int main()
 
     //Creates glfw window to render pixels within
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, ":3 UwU XD SillyWindow", glfwGetPrimaryMonitor() , NULL);
+    
+    
 
     //checks that the new window isnt null, if it is then it will terminate with an error
     if (window == NULL)
@@ -194,6 +205,11 @@ int main()
         glfwTerminate();
         return -1;
     }
+
+    //Sets the icon for the program
+    iconImage[0].pixels = stbi_load(strcat(iconPath, "/assets/icon.png"), &iconImage[0].width, &iconImage[0].height, 0, 4);
+    glfwSetWindowIcon(window, 1, iconImage);
+    stbi_image_free(iconImage[0].pixels);
 
     //sets the current context to the new window
     glfwMakeContextCurrent(window);
