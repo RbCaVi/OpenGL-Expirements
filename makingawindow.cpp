@@ -27,13 +27,12 @@ int framebufferHeight;
 GLFWimage iconImage[1];
 
 //Path to all relevant files
-std::string currentPath = std::filesystem::current_path().string();
-char curPath[100];
-char vertexPath[100];
-char fragPath[100];
-char iconPath[100];
-char tex1Path[100];
-char tex2Path[100];
+std::filesystem::path currentPath = std::filesystem::current_path();
+std::filesystem::path vertexPath;
+std::filesystem::path fragPath;
+std::filesystem::path iconPath;
+std::filesystem::path tex1Path;
+std::filesystem::path tex2Path;
 
 //Vertex Array Object (i.e stores vertex attributes)
 unsigned int VAO;
@@ -159,22 +158,12 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 //Prepares the paths
 void preparePath() {
-    char oldChar = '\\';
-    char newChar = '/';
-
-    // Iterate through the string and replace the characters
-    for (int i = 0; i < currentPath.length(); i++) {
-        if (currentPath[i] == oldChar) {
-            currentPath[i] = newChar;
-        }
-    }
-    strcpy(curPath, currentPath.c_str());
-    strcpy(vertexPath, curPath);
-    strcpy(fragPath, curPath);
-    strcpy(tex1Path, curPath);
-    strcpy(tex2Path, curPath);
-    strcpy(iconPath, curPath);
-    std::cout << curPath << '\n';
+    vertexPath = currentPath / "shaders/shader.vs";
+    fragPath = currentPath / "shaders/shader.fs";
+    tex1Path = currentPath / "assets/milly.png";
+    tex2Path = currentPath / "assets/boba.png";
+    iconPath = currentPath / "assets/icon.png";
+    std::cout << currentPath << '\n';
 }
 
 int main()
@@ -207,7 +196,7 @@ int main()
     }
 
     //Sets the icon for the program
-    iconImage[0].pixels = stbi_load(strcat(iconPath, "/assets/icon.png"), &iconImage[0].width, &iconImage[0].height, 0, 4);
+    iconImage[0].pixels = stbi_load(iconPath, &iconImage[0].width, &iconImage[0].height, 0, 4);
     glfwSetWindowIcon(window, 1, iconImage);
     stbi_image_free(iconImage[0].pixels);
 
@@ -237,7 +226,7 @@ int main()
 
     //compiles the shader
     
-    Shader ourShader(strcat(vertexPath, "/shaders/shader.vs"), strcat(fragPath, "/shaders/shader.fs"));
+    Shader ourShader(vertexPath, fragPath));
 
     
     //generates a vertex attribute array
@@ -283,7 +272,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load(strcat(tex1Path, "/assets/milly.png"), &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(tex1Path, &width, &height, &nrChannels, 0);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -301,7 +290,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    unsigned char* secondata = stbi_load(strcat(tex2Path, "/assets/boba.png"), &width, &height, &nrChannels, 0);
+    unsigned char* secondata = stbi_load(tex2Path, &width, &height, &nrChannels, 0);
     if (secondata) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, secondata);
         glGenerateMipmap(GL_TEXTURE_2D);
