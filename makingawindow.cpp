@@ -168,7 +168,7 @@ void preparePath() {
             currentPath[i] = newChar;
         }
     }
-    strcpy_s(curPath, currentPath.c_str());
+    strcpy(curPath, currentPath.c_str());
     strcpy(vertexPath, curPath);
     strcpy(fragPath, curPath);
     strcpy(tex1Path, curPath);
