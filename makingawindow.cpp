@@ -54,8 +54,8 @@ unsigned int EBO;
 //char infoLog[512]; // not used?
 
 //const default screen sizes
-const unsigned int SCR_WIDTH = 2560;
-const unsigned int SCR_HEIGHT = 1440;
+const unsigned int SCR_WIDTH = 500;
+const unsigned int SCR_HEIGHT = 500;
 
 //changes in the cameras speed
 float changeInCameraSpeed = 0.0f;
@@ -181,7 +181,7 @@ int main()
 #endif
 
     //Creates glfw window to render pixels within
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, ":3 UwU XD SillyWindow", glfwGetPrimaryMonitor() , NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, ":3 UwU XD SillyWindow", NULL , NULL);
     
     
 
