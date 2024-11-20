@@ -53,7 +53,7 @@ public:
 
 		unsigned int vertex, fragment;
 		int success;
-		char infolog[512];
+		char *infolog;
 
 		//vertex shader
 		vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -62,20 +62,36 @@ public:
 		//vertex compile errors
 		glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(vertex, 512, NULL, infolog);
-			std::cout << "ERROR::SHADER::VERTEX:COMPILATION_FAILED\n" << infolog << std::endl;
+			std::cout << "ERROR::SHADER::VERTEX:COMPILATION_FAILED\n";
+   int loglength;
+   glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &loglength);
+   if (loglength > 0) {
+    log = (GLchar*)malloc(loglength);
+    glGetShaderInfoLog(vertex, loglength, NULL, infolog);
+    std::cout << infolog;
+    free(infolog);
+   }
+   std::cout << std::endl;
 		}
 
 		//frag shader
 		fragment = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragment, 1, &fShaderCode, NULL);
 		glCompileShader(fragment);
-		glGetProgramiv(fragment, GL_LINK_STATUS, &success);
+		glGetProgramiv(fragment, GL_COMPILE_STATUS, &success); // was GL_LINK_STATUS - looks like an error
 		//frag compile errors
 		if (!success)
 		{
-			glGetProgramInfoLog(fragment, 512, NULL, infolog);
-			std::cout << "ERROR::PROGRAM::COMPILATION_FAILED\n" << infolog << std::endl;
+			std::cout << "ERROR::PROGRAM::COMPILATION_FAILED\n";
+   int loglength;
+   glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &loglength);
+   if (loglength > 0) {
+    log = (GLchar*)malloc(loglength);
+    glGetShaderInfoLog(fragment, loglength, NULL, infolog);
+    std::cout << infolog;
+    free(infolog);
+   }
+   std::cout << std::endl;
 		}
 
 		//making the shader program
@@ -86,8 +102,16 @@ public:
 
 		glGetProgramiv(ID, GL_LINK_STATUS, &success);
 		if (!success) {
-			glGetProgramInfoLog(ID, 512, NULL, infolog);
-			std::cout << "ERROR:SHADER::PROGRAM::LINKING_FAILED" << infolog << std::endl;
+			std::cout << "ERROR:SHADER::PROGRAM::LINKING_FAILED";
+   int loglength;
+   glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &loglength);
+   if (loglength > 0) {
+    log = (GLchar*)malloc(loglength);
+    glGetShaderInfoLog(ID, loglength, NULL, infolog);
+    std::cout << infolog;
+    free(infolog);
+   }
+   std::cout << std::endl;
 		}
 
 		glDeleteShader(vertex);
