@@ -19,12 +19,8 @@ void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
-//framebuffer variables
-int framebufferWidth;
-int framebufferHeight;
-
 //icon image
-GLFWimage iconImage[1];
+GLFWimage iconImage/*[1]*/; // use & to pretend it's an array of one element
 
 //Path to all relevant files
 std::filesystem::path currentPath = std::filesystem::current_path();
@@ -35,7 +31,7 @@ std::filesystem::path tex1Path;
 std::filesystem::path tex2Path;
 
 //Vertex Array Object (i.e stores vertex attributes)
-unsigned int VAO;
+//unsigned int VAO; // is this used?
 
 //Vertex Buffer Object (stores GPU memory for the vertex shader)
 unsigned int VBO;
@@ -44,18 +40,18 @@ unsigned int VBO;
 unsigned int EBO;
 
 //vertex shader object (i.e. holds vertex shader id)
-unsigned int vertexShader;
+//unsigned int vertexShader; // not mentioned?
 
 //fragment shader object (i.e. holds frag shader id)
-unsigned int fragmentShader;
+//unsigned int fragmentShader; // not mentioned?
 
 //ref id to the final shader program
-unsigned int shaderProgram;
+//unsigned int shaderProgram; // never initialized
 
 //for error handling later to see if compilation was successful
-int success;
+//int success; // not used?
 //an infolog to explain any error that may show up
-char infoLog[512];
+//char infoLog[512]; // not used?
 
 //const default screen sizes
 const unsigned int SCR_WIDTH = 2560;
@@ -74,7 +70,7 @@ float lastFrame = 0.0f;
 //direction for the rotation
 float yaw = -90.0f;
 float pitch = 0.0f;
-bool firstMouse = true;
+//bool firstMouse = true; // not used?
 float fov = 45.0f;
 
 
@@ -158,6 +154,8 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 //Prepares the paths
 void preparePath() {
+    // shouldn't these paths be inlined into main?
+    // (i changed them from string to std::filesystem::path and moved the additional paths to here)
     vertexPath = currentPath / "shaders/shader.vs";
     fragPath = currentPath / "shaders/shader.fs";
     tex1Path = currentPath / "assets/milly.png";
@@ -196,15 +194,19 @@ int main()
     }
 
     //Sets the icon for the program
-    iconImage[0].pixels = stbi_load(iconPath, &iconImage[0].width, &iconImage[0].height, 0, 4);
-    glfwSetWindowIcon(window, 1, iconImage);
-    stbi_image_free(iconImage[0].pixels);
+    iconImage.pixels = stbi_load(iconPath, &iconImage.width, &iconImage.height, 0, 4);
+    glfwSetWindowIcon(window, 1, &iconImage);
+    stbi_image_free(iconImage.pixels);
 
     //sets the current context to the new window
     glfwMakeContextCurrent(window);
 
     //sets the framebuffersize (i.e. storing how much of frame is stored)
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    //framebuffer variables // these are only used here, so i moved them
+    int framebufferWidth;
+    int framebufferHeight;
 
     //gets the framebuffer setting the height & width to two variables
     glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
@@ -230,14 +232,14 @@ int main()
 
     
     //generates a vertex attribute array
-    glGenVertexArrays(1, &VAO);
+    //glGenVertexArrays(1, &VAO); // is this used?
     //Generates a vertex buffer, setting VBO as an id to it
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
     
 
     //binds the vertex array object
-    glBindVertexArray(VAO);
+    //glBindVertexArray(VAO); // is this used?
     //binds the array buffer to the VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     //binds ebo buffer to the EBO
@@ -305,6 +307,14 @@ int main()
 
     //Enables the Z-BUFFER
     glEnable(GL_DEPTH_TEST);
+    
+    // these look like one off kind of things (surely you don't have to reregister the callbacks every frame right?) (moved from processInput)
+    //disables visible cursor capture
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //sets the cursor input to the proper function
+    glfwSetCursorPosCallback(window, mouse_callback);
+    //sets the scroll wheel input to its proper callback
+    glfwSetScrollCallback(window, scroll_callback);
 
     //the render loop
     while (!glfwWindowShouldClose(window))
@@ -335,20 +345,20 @@ int main()
 
         //sets up uniforms for the coordinate spaces
         //--unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
-        unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
-        unsigned int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
-        unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
+        //unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model"); // not used?? (also a get operation should be a Shader method)
+        //unsigned int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
+        //unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
 
         //--glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
         //--glm::mat4 trans = glm::mat4(1.0f);
 
         //Base mat4 coordinate transformations
         glm::mat4 view;
-        glm::mat4 projection = glm::mat4(1.0f);
+        glm::mat4 projection;// = glm::mat4(1.0f); // it's set again 10 lines down, so why set it here?
 
-        const float radialSpin = 10.0f;
-        float camX = sin(glfwGetTime()) * radialSpin;
-        float camZ = cos(glfwGetTime()) * radialSpin;
+        //const float radialSpin = 10.0f; // not used
+        //float camX = sin(glfwGetTime()) * radialSpin;
+        //float camZ = cos(glfwGetTime()) * radialSpin;
 
         //--view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), cameraFront, cameraUp);
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -394,9 +404,10 @@ int main()
         glfwPollEvents();
     }
     //delete the unused arrays
-    glDeleteVertexArrays(1, &VAO);
+    //glDeleteVertexArrays(1, &VAO); // is this used?
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    glDeleteBuffers(1, &EBO); // does this need to be freed?
+    //glDeleteProgram(shaderProgram); // shaderProgram is never initialized
 
     //ends the glfw library
     glfwTerminate();
@@ -405,12 +416,6 @@ int main()
 
 //takes in the input while window is active
 void processInput(GLFWwindow* window) {
-    //disables visible cursor capture
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    //sets the cursor input to the proper function
-    glfwSetCursorPosCallback(window, mouse_callback);
-    //sets the scroll wheel input to its proper callback
-    glfwSetScrollCallback(window, scroll_callback);
     //camera movement speed
     float cameraSpeed = 2.5f * deltaTime + changeInCameraSpeed;
     //right normalized vector
