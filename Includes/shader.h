@@ -64,9 +64,9 @@ public:
 		if (!success) {
 			std::cout << "ERROR::SHADER::VERTEX:COMPILATION_FAILED\n";
 			int loglength;
-			glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &loglength);
+			glGetShaderiv(vertex, GL_INFO_LOG_LENGTH, &loglength);
 			if (loglength > 0) {
-				log = (GLchar*)malloc(loglength);
+				infolog = (char*)malloc(loglength);
 				glGetShaderInfoLog(vertex, loglength, NULL, infolog);
 				std::cout << infolog;
 				free(infolog);
@@ -84,9 +84,9 @@ public:
 		{
 			std::cout << "ERROR::PROGRAM::COMPILATION_FAILED\n";
 			int loglength;
-			glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &loglength);
+			glGetShaderiv(fragment, GL_INFO_LOG_LENGTH, &loglength);
 			if (loglength > 0) {
-				log = (GLchar*)malloc(loglength);
+				infolog = (char*)malloc(loglength);
 				glGetShaderInfoLog(fragment, loglength, NULL, infolog);
 				std::cout << infolog;
 				free(infolog);
@@ -106,7 +106,7 @@ public:
 			int loglength;
 			glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &loglength);
 			if (loglength > 0) {
-				log = (GLchar*)malloc(loglength);
+				infolog = (char*)malloc(loglength);
 				glGetShaderInfoLog(ID, loglength, NULL, infolog);
 				std::cout << infolog;
 				free(infolog);
@@ -176,13 +176,13 @@ public:
 	bool getBool(const std::string& name) 
 	{
 		bool value;
-		glGetnUniformiv(ID, glGetUniformLocation(ID, name.c_str()), 1, (int)value);
+		glGetnUniformiv(ID, glGetUniformLocation(ID, name.c_str()), 1, &(int&)value);
 		return value;
 	}
 	int getInt(const std::string& name) 
 	{
 		int value;
-		glGetnUniformiv(ID, glGetUniformLocation(ID, name.c_str()), 1, value);
+		glGetnUniformiv(ID, glGetUniformLocation(ID, name.c_str()), 1, &value);
 		return value;
 	}
 	float getFloat(const std::string& name) 
@@ -191,39 +191,39 @@ public:
 		glGetnUniformfv(ID, glGetUniformLocation(ID, name.c_str()), 1, &value);
 		return value;
 	}
-	glm::vec2& getVec2(const std::string& name) 
+	glm::vec2 getVec2(const std::string& name) 
 	{
-		glm::vec2& value;
+		glm::vec2 value;
 		glGetnUniformfv(ID, glGetUniformLocation(ID, name.c_str()), 2, &value[0]);
 		return value;
 	}
-	glm::vec3& getVec3(const std::string& name) 
+	glm::vec3 getVec3(const std::string& name) 
 	{
-		glm::vec3& value;
+		glm::vec3 value;
 		glGetnUniformfv(ID, glGetUniformLocation(ID, name.c_str()), 3, &value[0]);
 		return value;
 	}
-	glm::vec4& getVec4(const std::string& name) 
+	glm::vec4 getVec4(const std::string& name) 
 	{
-		glm::vec4& value;
+		glm::vec4 value;
 		glGetnUniformfv(ID, glGetUniformLocation(ID, name.c_str()), 4, &value[0]);
 		return value;
 	}
-	glm::mat2& getMat2(const std::string& name) 
+	glm::mat2 getMat2(const std::string& name) 
 	{
-		glm::mat2& mat;
+		glm::mat2 mat;
 		glGetnUniformfv(ID, glGetUniformLocation(ID, name.c_str()), 4, &mat[0][0]);
 		return mat;
 	}
-	glm::mat3& getMat3(const std::string& name) 
+	glm::mat3 getMat3(const std::string& name) 
 	{
-		glm::mat3& mat;
+		glm::mat3 mat;
 		glGetnUniformfv(ID, glGetUniformLocation(ID, name.c_str()), 9, &mat[0][0]);
 		return mat;
 	}
-	glm::mat4& getMat4(const std::string& name) 
+	glm::mat4 getMat4(const std::string& name) 
 	{
-		glm::mat4& mat;
+		glm::mat4 mat;
 		glGetnUniformfv(glGetUniformLocation(ID, name.c_str()), 1, 16, &mat[0][0]);
 		return mat;
 	}
