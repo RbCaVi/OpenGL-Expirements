@@ -194,7 +194,7 @@ int main()
     }
 
     //Sets the icon for the program
-    iconImage.pixels = stbi_load(iconPath, &iconImage.width, &iconImage.height, 0, 4);
+    iconImage.pixels = stbi_load(iconPath.c_str(), &iconImage.width, &iconImage.height, 0, 4);
     glfwSetWindowIcon(window, 1, &iconImage);
     stbi_image_free(iconImage.pixels);
 
@@ -228,7 +228,7 @@ int main()
 
     //compiles the shader
     
-    Shader ourShader(vertexPath, fragPath));
+    Shader ourShader(vertexPath.c_str(), fragPath.c_str());
 
     
     //generates a vertex attribute array
@@ -274,7 +274,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load(tex1Path, &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(tex1Path.c_str(), &width, &height, &nrChannels, 0);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -292,7 +292,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    unsigned char* secondata = stbi_load(tex2Path, &width, &height, &nrChannels, 0);
+    unsigned char* secondata = stbi_load(tex2Path.c_str(), &width, &height, &nrChannels, 0);
     if (secondata) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, secondata);
         glGenerateMipmap(GL_TEXTURE_2D);
