@@ -462,7 +462,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     yoffset *= sensitivity;
 
     //updates the yaw and pitch according to the offset
-    yaw += xoffset;
+    yaw += -xoffset;
     pitch += yoffset;
 
     //pitch parameters
@@ -472,7 +472,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
         pitch = -89.0f;
     }
     //using the input variables to make the new direction & normalizing it
-    glm::vec3 direction = glm::vec3(cos(glm::radians(yaw)) * cos(glm::radians(yaw)),
+    glm::vec3 direction = glm::vec3(cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
         sin(glm::radians(pitch)),
         sin(glm::radians(yaw)) * cos(glm::radians(pitch)));
     cameraFront = glm::normalize(direction);
