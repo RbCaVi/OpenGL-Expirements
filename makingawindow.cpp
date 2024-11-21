@@ -31,7 +31,7 @@ std::filesystem::path tex1Path;
 std::filesystem::path tex2Path;
 
 //Vertex Array Object (i.e stores vertex attributes)
-//unsigned int VAO; // is this used?
+unsigned int VAO;
 
 //Vertex Buffer Object (stores GPU memory for the vertex shader)
 unsigned int VBO;
@@ -232,14 +232,14 @@ int main()
 
     
     //generates a vertex attribute array
-    //glGenVertexArrays(1, &VAO); // is this used?
+    glGenVertexArrays(1, &VAO);
     //Generates a vertex buffer, setting VBO as an id to it
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
     
 
     //binds the vertex array object
-    //glBindVertexArray(VAO); // is this used?
+    glBindVertexArray(VAO);
     //binds the array buffer to the VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     //binds ebo buffer to the EBO
@@ -404,7 +404,7 @@ int main()
         glfwPollEvents();
     }
     //delete the unused arrays
-    //glDeleteVertexArrays(1, &VAO); // is this used?
+    glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO); // does this need to be freed?
     //glDeleteProgram(shaderProgram); // shaderProgram is never initialized
