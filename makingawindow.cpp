@@ -40,8 +40,8 @@ unsigned int VBO;
 unsigned int EBO;
 
 //const default screen sizes
-const unsigned int SCR_WIDTH = 500;
-const unsigned int SCR_HEIGHT = 500;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 800;
 
 //changes in the cameras speed
 float changeInCameraSpeed = 0.0f;
