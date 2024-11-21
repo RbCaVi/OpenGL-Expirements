@@ -20,7 +20,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 //icon image
-GLFWimage iconImage/*[1]*/; // use & to pretend it's an array of one element
+GLFWimage iconImage; // use & to pretend it's an array of one element
 
 //Path to all relevant files
 std::filesystem::path currentPath = std::filesystem::current_path();
@@ -38,20 +38,6 @@ unsigned int VBO;
 
 //Element Buffer Object (stores element array gpu memory)
 unsigned int EBO;
-
-//vertex shader object (i.e. holds vertex shader id)
-//unsigned int vertexShader; // not mentioned?
-
-//fragment shader object (i.e. holds frag shader id)
-//unsigned int fragmentShader; // not mentioned?
-
-//ref id to the final shader program
-//unsigned int shaderProgram; // never initialized
-
-//for error handling later to see if compilation was successful
-//int success; // not used?
-//an infolog to explain any error that may show up
-//char infoLog[512]; // not used?
 
 //const default screen sizes
 const unsigned int SCR_WIDTH = 500;
