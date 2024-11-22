@@ -302,6 +302,12 @@ int main()
     //sets the scroll wheel input to its proper callback
     glfwSetScrollCallback(window, scroll_callback);
 
+    //sets & binds each of the textures
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+
     //the render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -314,12 +320,6 @@ int main()
         glClearColor(0.4f, 0.3f, 0.5f, 1.0f);
         //clears it to the the color buffer (i.e. the clear color setting) & uses the z-buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        //sets & binds each of the textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
 
         //gets the deltaTime using differing times & frames
         float currentFrame = glfwGetTime();
