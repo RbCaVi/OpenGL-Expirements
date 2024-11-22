@@ -138,6 +138,9 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
     0.5f, 1.0f
 }; */
 
+// time warp
+float extraTime = 0.0f;
+
 //Prepares the paths
 void preparePath() {
     // shouldn't these paths be inlined into main?
@@ -356,7 +359,7 @@ int main()
 
 
             //rotates the local space by 50 rads over time
-            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(deltaRotatedAngle), glm::vec3(0.5f, 1.0f, 0.0f));
+            model = glm::rotate(model, ((float)glfwGetTime() + extraTime) * glm::radians(deltaRotatedAngle), glm::vec3(0.5f, 1.0f, 0.0f));
 
             ourShader.setMat4("model", model);
 
@@ -412,6 +415,12 @@ void processInput(GLFWwindow* window) {
     }
     if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
         changeInCameraSpeed -= 0.01f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        extraTime += 4 * deltaTime;
+    }
+    if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
+        extraTime -= 6 * deltaTime;
     }
 }
 //handles mouse input functionality
