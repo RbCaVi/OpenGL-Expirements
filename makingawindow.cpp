@@ -329,38 +329,18 @@ int main()
         //uses the program
         ourShader.use();
 
-        //sets up uniforms for the coordinate spaces
-        //--unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
-        //unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model"); // not used?? (also a get operation should be a Shader method)
-        //unsigned int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
-        //unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
-
-        //--glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-        //--glm::mat4 trans = glm::mat4(1.0f);
 
         //Base mat4 coordinate transformations
         glm::mat4 view;
-        glm::mat4 projection;// = glm::mat4(1.0f); // it's set again 10 lines down, so why set it here?
+        glm::mat4 projection;
 
-        //const float radialSpin = 10.0f; // not used
-        //float camX = sin(glfwGetTime()) * radialSpin;
-        //float camZ = cos(glfwGetTime()) * radialSpin;
-
-        //--view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), cameraFront, cameraUp);
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
         //sets the value for each mat4 transformation in coordinate spaces
         projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
-        //Sets the above matrix values to their corresponding uniforms
-        //--glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-        
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
-        
-        //--trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
-        //--trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        
         
         //model render loop
         for (unsigned int i = 0; i < 10; i++) {
